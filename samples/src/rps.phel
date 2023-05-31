@@ -1,0 +1,52 @@
+(ns src\rps)
+
+(def rock "r")
+(def paper "p")
+(def scissors "s")
+(def possible-guesses [rock paper scissors])
+
+# TODO: how about some validation?
+(defn read-player [& args]
+  (let [prompt (if (= (count args) 0) "What do you do? [p/r/s] " (first args))
+        x (php/readline prompt)]
+    (if (contains-value? possible-guesses (php/substr x 0))
+      x
+      (recur ["Not valid [p/r/s] "]))))
+
+(defn read-cpu [] (rand-nth possible-guesses))
+
+(def victory-map {paper rock
+                  rock scissors
+                  scissors paper})
+
+(defn evaluate-game [player cpu]
+  (cond
+    (= player cpu) :draw
+    (= (victory-map player) cpu) :youwin
+    true :youlose))
+
+(defn print-result [result]
+  (println (case result
+             :draw "Draw!"
+             :youwin "You win!"
+             :youlose "You lose!")))
+
+(defn run [player-score cpu-score]
+  (let
+    [player (read-player (str "Current score: Player=" player-score " CPU=" cpu-score ". What do you play? [p/r/s]"))
+     cpu (read-cpu)
+     result (evaluate-game player cpu)]
+    (println "The computer plays" cpu)
+    (print-result result)
+    result))
+
+(defn play [player-score cpu-score]
+  (cond
+    (= player-score 3) (println "You win the game!")
+    (= cpu-score 3) (println "You lose the game!")
+    true (case (run player-score cpu-score)
+           :draw (recur player-score cpu-score)
+           :youwin (recur (inc player-score) cpu-score)
+           :youlose (recur player-score (inc cpu-score)))))
+
+(play 0 0)

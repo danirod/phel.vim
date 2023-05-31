@@ -1,0 +1,28 @@
+(ns src\numbers)
+
+# Given a list of numbers and a constant k, give a function that tests whether two of the
+# numbers in the list would sum k. For instance, given [10 3 4 7] and k = 17, it would
+# yield true, because 10 + 7 = 17, but for [10 3 4 7] and k = 18, it would yield false
+# because there is no pair of numbers that can add 18.
+
+# Iterative version, using the two loops
+(defn add-iterative? [lst k]
+  (let [n (count lst)
+        # TODO: You can halt loops in Phel, this could be optimized to stop once a result is found.
+        sums (for [i :range [0 n] j :range [(inc i) n]] (+ (lst i) (lst j)))]
+    (contains-value? sums k)))
+
+# Nicer version without a for-loop. It works by computing first a list of expected numbers that
+# would make up to k, then check whether any of these expected numbers is also part of the list
+# of numbers.
+(defn add-nice? [lst k]
+      (let [diffs (map (fn [i] (- k i)) lst)
+                  diffs-set (apply set diffs)
+                  lst-set (apply set lst)]
+        # If there is a single number, it is trying to add to itself (like [1 2 3 4] 8).
+        (> (count (intersection diffs-set lst-set)) 1)))
+
+(def numbers [10 3 4 7])
+(def k 17)
+(println (add-iterative? numbers k))
+(println (add-nice? numbers k))
